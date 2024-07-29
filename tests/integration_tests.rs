@@ -79,4 +79,8 @@ fn test_character_length() {
   let sample_str = "à";
   assert_eq!(sample_str.char_len(), sample_str.len() / 2);
 
+  let sample_str = "abc";
+  assert_eq!(sample_str.to_end_byte_index(9), 3);
+
+
 }

@@ -31,7 +31,8 @@ let result = sample_str.substring_start(5);
 
 
 ### substring_end
-This will return the end of a string (```str``` or ```string```) from the specified start character index.
+
+This method returns the end of a string (```str``` or ```string```) from the specified start character index.
 ```rust
 let sample_str = "/long/file/path";
 let result = sample_str.substring_start(5);
@@ -41,22 +42,35 @@ let result = sample_str.substring_start(5);
 
 ### substring_replace
 
+This method removes characters between the specified start and end indices and inserts a replacement string
 ```rust
 let new_string = "azdefgh".substring_replace("bc", 1, 2);
 println!("{}", new_string);
 // will print "abcdefgh"
 ```
 
-#### substring_replace_end
-This replacse the remainder of string from a specified start character index
+#### substring_replace_start
+
+This method replaces the start of a string to a specified end character index
 ```rust
+// remove the first 2 characters and prepend the string "xyz"
+let new_string = "abcdefgh".substring_replace_start("xyz", 2);
+println!("{}", new_string);
+// will print "xyzcdefgh"
+```
+
+#### substring_replace_end
+
+This method replaces the remainder of string from a specified start character index
+```rust
+// remove all characters after and index of 3 and append the string "xyz"
 let new_string = "abcdefgh".substring_replace_end("xyz", 3);
 println!("{}", new_string);
 // will print "abcxyz"
 ```
 
 ### substring_offset
-This extract a substring from a start index for n characters to the right or left.
+This method extracts a substring from a start index for n characters to the right or left.
 A negative length in the second parameter will start at the start index
 ```rust
 let sample_str = "indian-elephant";
@@ -75,23 +89,25 @@ let result = sample_str.substring_insert("/b", 1);
 ```
 
 ### to_start_byte_index
-This convert characters index to a start byte index and is mainly used internally
 
+This convert a start character index to a start byte index. It's mainly used internally.
+It differs only from the ```to_end_byte_index``` in its default value of 0 if it overflows.
 ```rust
 let byte_index = "नमस्ते".to_start_byte_index(2);
-// yields byte index of the third multibyte character. It should be 6
+// yields byte index of at the start of third multibyte character (character index 2). It should be 6
 ```
 
 ### to_end_byte_index
-This convert characters index to an end byte index and is mainly used internally
+
+This method converts an end character index to an end byte index. It's mainly used internally.
+It differs only from the ```to_end_byte_index``` in its default value at the end if it overflows.
 
 ### char_len
-This returns the character length in terms of indivual unicode symbols as opposed to byte length with ```str::len()```.
 
+This returns the character length in terms of individual unicode symbols as opposed to byte length with ```str::len()```.
 ```rust
 let emoji = "😎";
-
-println("Emoji length: {:?}, emoji byte length: {:?}", emoji.char_len(), emoihi.len() );
+println!("Emoji length: {}, emoji byte length: {}", emoji.char_len(), emoji.len() );
 // prints: Emoji length: 1, emoji byte length: 4
 ```
 
