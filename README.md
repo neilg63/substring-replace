@@ -6,7 +6,7 @@
 
 This crate adds a set of convenient methods to easily extract, insert and replace string slices in Rust with character indices compatibile with multibyte characters.
 
-Do not add this library to your project if it already depends on the [substring](https://crates.io/crates/substring) crate. Its core substring method, while sharing the same signature and functionality, will conflict with the same method in the ```SubstringReplace``` trait, although the implementation in this crate avoids an unsafe block and will not panic if the start and end indices are out of range.
+Do not add this library to your project if it already depends on the [substring](https://crates.io/crates/substring) crate. Its core substring method, while sharing the same signature and functionality, will conflict with the same method in the ```SubstringReplace``` trait, although the implementation in this crate avoids an unsafe block and will not panic if the start and end indices are out of range. 
 
 Regular Rust prefers ```str``` slices for extracting string by index ranges. However, it will panic when indices are out of range and works with byte indices rather than the more intuitive character indices as used with the [Regex](https://crates.io/crates/regex) crate. 
 
