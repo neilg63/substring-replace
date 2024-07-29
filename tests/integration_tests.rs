@@ -59,6 +59,15 @@ fn test_inject_substring() {
   assert_eq!(sample_str.substring_insert("bc", 1), target_str);
 }
 
+
+#[test]
+fn test_substring_replace_start_end() {
+  let sample_str = "abcdefg";
+  let extra = "xyz";
+  assert_eq!(sample_str.substring_replace_start(extra, 3), "xyzdefg");
+  assert_eq!(sample_str.substring_replace_end(extra, 3), "abcxyz");
+}
+
 #[test]
 fn test_character_length() {
   // Devanagari characters use 3 bytes each
