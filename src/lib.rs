@@ -59,9 +59,9 @@ pub trait SubstringReplace {
     }
 
     /// Insert a string at a given character index
-    /// This differs from String::insert as it uses character rather than byte indices
-    /// and thus works better with multibyte characters
-    /// It's also implemented to str, while returning a new owned string
+    /// This differs from String::insert by using character rather than byte indices
+    /// to work better with multibyte characters
+    /// It also works directly with &str, while returning a new owned string
     fn substring_insert(&self, replacement: &str, start: usize) -> String {
         self.substring_replace(replacement, start, start)
     }

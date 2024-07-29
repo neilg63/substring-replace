@@ -14,62 +14,85 @@ Regular Rust prefers ```str``` slices for extracting string by index ranges. How
 
 Returns a substring by start and end character index. With multibyte characters this will not be the same as the byte indices.
 
-### ```substring_start
-
 ```rust
 let sample_str = "/long/file/path";
-let result = sample_str.substring_start(5,9);
+let result = sample_str.substring(5,9);
 // the result is "file"
 ```
 
-### ```substring_end```
+### substring_start
+
+This will return the start of a string (```str``` or ```string```) until the specified end character index.
+```rust
+let sample_str = "/long/file/path";
+let result = sample_str.substring_start(5);
+// the result is "/long"
+```
 
 
-### ```substring_replace```
-fn substring_replace_start(&self, replacement: &str, end: usize) -> String {
-    self.substring_replace(replacement, 0, end)
-}
+### substring_end
+This will return the end of a string (```str``` or ```string```) from the specified start character index.
+```rust
+let sample_str = "/long/file/path";
+let result = sample_str.substring_start(5);
+// the result is "/file/path"
+```
 
-    /// Replace the remainder of string from a specified start character index
-    /// e.g. "blue".substring_replace_last("ack", 2);
-    /// will replace the last 2 characters with "ack", yielding "black"
-    fn substring_replace_end(&self, replacement: &str, start: usize) -> String {
-        let end = self.char_len();
-        self.substring_replace(replacement, start, end)
-    }
 
-    /// Extract a substring from a start index for n characters to the right
-    /// A negative length in the second parameter will start at the start index
-    fn substring_offset(&self, position: usize, length: i32) -> &str {
-        let reverse = length < 0; 
-        let start = if reverse {
-            position.checked_sub(length.abs() as usize).unwrap_or(0)
-        } else {
-            position
-        };
-        let start_i32 =  if start > i32::MAX as usize { i32::MAX } else { start as i32 };
-        let end_i32 = start_i32 + length.abs();
-        let end = if end_i32 < 0 {
-            0
-        } else {
-            end_i32 as usize
-        };
-        self.substring(start, end)
-    }
+### substring_replace
 
-    /// Insert a string at a given character index
-    /// This differs from String::insert as it uses character rather than byte indices
-    /// and thus works better with multibyte characters
-    /// It's also implemented to str, while returning a new owned string
-    fn substring_insert(&self, replacement: &str, start: usize) -> String {
-        self.substring_replace(replacement, start, start)
-    }
+```rust
+let new_string = "azdefgh".substring_replace("bc", 1, 2);
+println!("{}", new_string);
+// will print "abcdefgh"
+```
 
-    /// Convert character index to start byte index
-    fn to_start_byte_index(&self, start: usize) -> usize;
+#### substring_replace_end
+This replacse the remainder of string from a specified start character index
+```rust
+let new_string = "abcdefgh".substring_replace_end("xyz", 3);
+println!("{}", new_string);
+// will print "abcxyz"
+```
 
-    /// Convert character index to end byte index
-    fn to_end_byte_index(&self, start: usize) -> usize;
+### substring_offset
+This extract a substring from a start index for n characters to the right or left.
+A negative length in the second parameter will start at the start index
+```rust
+let sample_str = "indian-elephant";
+let result = sample_str.substring_offset(7, 3);
+// result will be "ele"
+```
 
-    /// Return the character length rather than the byte length
-    fn char_len(&self) -> usize;
+### substring_insert
+
+This method inserts a string at a given character index and differs from the standard ```String::insert``` method by using character rather than byte indices to work better with multibyte characters. It also works directly with ```&str```, but returns a new owned string.
+
+```rust
+let sample_str = "a/c";
+let result = sample_str.substring_insert("/b", 1);
+// result will be "a/b/c"
+```
+
+### to_start_byte_index
+This convert characters index to a start byte index and is mainly used internally
+
+```rust
+let byte_index = "नमस्ते".to_start_byte_index(2);
+// yields byte index of the third multibyte character. It should be 6
+```
+
+### to_end_byte_index
+This convert characters index to an end byte index and is mainly used internally
+
+### char_len
+This returns the character length in terms of indivual unicode symbols as opposed to byte length with ```str::len()```.
+
+```rust
+let emoji = "😎";
+
+println("Emoji length: {:?}, emoji byte length: {:?}", emoji.char_len(), emoihi.len() );
+// prints: Emoji length: 1, emoji byte length: 4
+```
+
+### NB: This is alpha release, but the crate is feature complete and supplements [string-patterns](https://crates.io/crates/string-patterns) and [simple-string-patterns](https://crates.io/crates/simple-string-patterns) .
