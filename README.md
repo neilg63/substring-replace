@@ -122,6 +122,7 @@ It differs only from the ```to_end_byte_index``` in its default value at the end
 ### char_len
 
 This returns the character length in terms of individual unicode symbols as opposed to byte length with ```str::len()```.
+This is shorthand for ```&str::char_indices().count()```.
 ```rust
 let emoji = "😎";
 println!("Emoji length: {}, emoji byte length: {}", emoji.char_len(), emoji.len() );
