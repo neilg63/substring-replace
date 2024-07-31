@@ -1,6 +1,5 @@
-use std::default;
-
-
+/// Trait with extension methods to manipulate substrings by character indices
+/// compatibile behaving like similar methods in other languages
 pub trait SubstringReplace {
 
     /// Return a substring by start and end character index
