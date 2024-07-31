@@ -39,7 +39,7 @@ fn test_replace_substring() {
 }
 
 #[test]
-fn test_replace_substring_multiibyte() {
+fn test_replace_substring_multibyte() {
   let str_ar = "مرحبًا أحمد";
   let repl = "سامي";
   
@@ -57,6 +57,16 @@ fn test_inject_substring() {
   let sample_str = "adefg";
   let target_str = "abcdefg";
   assert_eq!(sample_str.substring_insert("bc", 1), target_str);
+}
+
+#[test]
+fn test_substring_remove() {
+  let sample_str = "abcdefg";
+  assert_eq!(sample_str.substring_remove(2, 5), "abfg");
+  // remove 2 characters before index 3
+  assert_eq!(sample_str.substring_pull(3, -2), "adefg");
+  // remove 2 characters from index 3
+  assert_eq!(sample_str.substring_pull(3, 2), "abcfg");
 }
 
 

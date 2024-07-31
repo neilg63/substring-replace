@@ -6,7 +6,7 @@
 
 This crate adds a set of convenient methods to easily extract, insert and replace string slices in Rust with character indices compatibile with multibyte characters.
 
-Do not add this library to your project if it already depends on the [substring](https://crates.io/crates/substring) crate. Its core substring method, while sharing the same signature and functionality, will conflict with the same method in the ```SubstringReplace``` trait, although the implementation in this crate avoids an unsafe block and will not panic if the start and end indices are out of range. 
+Do not add this library to your project if it already depends on the [substring](https://crates.io/crates/substring) crate. Its core substring method will conflict with the same method in the ```SubstringReplace``` trait. The like-named modules share the same signature and functionality, although this crate avoids unsafes block and will not panic if the start and end indices are out of range.
 
 Regular Rust prefers ```str``` slices for extracting string by index ranges. However, it will panic when indices are out of range and works with byte indices rather than the more intuitive character indices as used with the [Regex](https://crates.io/crates/regex) crate. 
 
@@ -69,9 +69,26 @@ println!("{}", new_string);
 // will print "abcxyz"
 ```
 
+### substring_remove
+This method returns the remainder after removing a substring delimited by start and end character indices.
+```rust
+let sample_str = "abcdefghij";
+let result = sample_str.substring_remove(3, 6);
+// result will be "abcfghij"
+```
+
 ### substring_offset
 This method extracts a substring from a start index for n characters to the right or left.
 A negative length in the second parameter will start at the start index
+```rust
+let sample_str = "indian-elephant";
+let result = sample_str.substring_offset(7, 3);
+// result will be "ele"
+```
+
+### substring_pull
+This method returns the remainder after removing a substring from a start index for n characters to the right or left.
+As with siubstring_offset, a negative length in the second parameter will start at the start index
 ```rust
 let sample_str = "indian-elephant";
 let result = sample_str.substring_offset(7, 3);

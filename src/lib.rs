@@ -1,3 +1,5 @@
+use std::default;
+
 
 pub trait SubstringReplace {
 
@@ -39,23 +41,29 @@ pub trait SubstringReplace {
         self.substring_replace(replacement, start, end)
     }
 
+    /// Remove a string delimited by a start and end character index
+    /// e.g. "abcde".substring_remove(2, 4);
+    /// will remove characters with indices of 2 and 3 (3rd and 4th or c and d)
+    /// resulting in "abe", i.e. the opposite behaviour to substring()
+    fn substring_remove(&self, start: usize, end: usize) -> String {
+        self.substring_replace("", start, end)
+    }
+
     /// Extract a substring from a start index for n characters to the right
     /// A negative length in the second parameter will start at the start index
     fn substring_offset(&self, position: usize, length: i32) -> &str {
-        let reverse = length < 0; 
-        let start = if reverse {
-            position.checked_sub(length.abs() as usize).unwrap_or(0)
-        } else {
-            position
-        };
-        let start_i32 =  if start > i32::MAX as usize { i32::MAX } else { start as i32 };
-        let end_i32 = start_i32 + length.abs();
-        let end = if end_i32 < 0 {
-            0
-        } else {
-            end_i32 as usize
-        };
+        let (start, end) = position_and_offset_to_start_end(position, length);
         self.substring(start, end)
+    }
+
+    /// Remove a string from a start position to given length
+    /// negative lengths will remove characters to the left
+    /// e.g. "abcde".substring_remove(3, -3);
+    /// will remove characters with indices of 1 and 2 (2nd and 3rd or b and c)
+    /// resulting in "ade", i.e. the opposite behaviour to substring_offset()
+    fn substring_pull(&self, position: usize, length: i32) -> String {
+        let (start, end) = position_and_offset_to_start_end(position, length);
+        self.substring_replace("", start, end)
     }
 
     /// Insert a string at a given character index
@@ -95,13 +103,13 @@ impl SubstringReplace for str {
     /// Translate the character start index to the start byte index
     /// to avoid boundary collisions with multibyte characters
     fn to_start_byte_index(&self, start: usize) -> usize {
-        self.char_indices().nth(start).map(|(i, _)| i).unwrap_or(0)
+        char_index_to_byte_index(self, start, false)
     }
 
     /// Translate the character end index to the end byte index
     /// to avoid boundary collisions with multibyte characters
     fn to_end_byte_index(&self, end: usize) -> usize {
-        self.char_indices().nth(end).map(|(i, _)| i).unwrap_or(self.len())
+        char_index_to_byte_index(self, end, true)
     }
 
     /// Return the character length as opposed to the byte length
@@ -111,3 +119,32 @@ impl SubstringReplace for str {
     }
 }
 
+/*
+* private function to convert a character index to byte index requied by &str slices
+*/
+fn char_index_to_byte_index(text: &str, char_index: usize, to_end: bool) -> usize {
+    let default_index = if to_end { text.len() } else { 0 };
+    text.char_indices().nth(char_index).map(|(i, _)| i).unwrap_or(default_index)
+}
+
+/*
+* private function to convert an index position and i32 position or negative offset length
+* to valid start and end indices
+* where the start must be positive and the end may not be before the start 
+*/
+fn position_and_offset_to_start_end(position: usize, length: i32) -> (usize, usize) {
+    let reverse = length < 0; 
+    let start = if reverse {
+        position.checked_sub(length.abs() as usize).unwrap_or(0)
+    } else {
+        position
+    };
+    let start_i32 =  if start > i32::MAX as usize { i32::MAX } else { start as i32 };
+    let end_i32 = start_i32 + length.abs();
+    let end = if end_i32 < 0 {
+        0
+    } else {
+        end_i32 as usize
+    };
+    (start, end)
+}
