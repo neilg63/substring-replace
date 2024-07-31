@@ -12,7 +12,7 @@ Regular Rust prefers ```str``` slices for extracting string by index ranges. How
 
 ### substring
 
-Returns a substring between start and end character indices. These indicies differ from byte indices with multibyte characters in the extended Latin-script, most non-Latin alphabets, many special symbols and emojis.
+Returns a substring between start and end character indices. These indices differ from byte indices with multibyte characters in the extended Latin-script, most non-Latin alphabets, many special symbols and emojis.
 
 ```rust
 let sample_str = "/long/file/path";
