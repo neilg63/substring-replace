@@ -132,3 +132,7 @@ println!("Emoji length: {}, emoji byte length: {}", emoji.char_len(), emoji.len(
 ---
 
 NB: This is an alpha release, but the crate is feature-complete and supplements [string-patterns](https://crates.io/crates/string-patterns) and [simple-string-patterns](https://crates.io/crates/simple-string-patterns) .
+
+### Version history
+
+**1.3:** Added new methods ```.substring_remove(start: usize, end: usize)``` and ```.substring_pull(position: usize, length: i32)```.
