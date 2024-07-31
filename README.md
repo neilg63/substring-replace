@@ -32,7 +32,7 @@ let result = sample_str.substring_start(5);
 
 ### substring_end
 
-This method returns the end of a string (```str``` or ```string```) from the specified start character index.
+This method returns the end of a string (```&str``` or ```string```) from the specified start character index.
 ```rust
 let sample_str = "/long/file/path";
 let result = sample_str.substring_start(5);
