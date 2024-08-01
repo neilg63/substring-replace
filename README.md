@@ -71,6 +71,7 @@ println!("{}", new_string);
 
 ### substring_remove
 This method returns the remainder after removing a substring delimited by start and end character indices.
+It's the oposite to **substring(start, end)**.
 ```rust
 let sample_str = "abcdefghij";
 let result = sample_str.substring_remove(3, 6);
@@ -79,7 +80,7 @@ let result = sample_str.substring_remove(3, 6);
 
 ### substring_offset
 This method extracts a substring from a start index for n characters to the right or left.
-A negative length in the second parameter will start at the start index
+A negative length in the second parameter will end at the reference index.
 ```rust
 let sample_str = "indian-elephant";
 let result = sample_str.substring_offset(7, 3);
@@ -88,11 +89,14 @@ let result = sample_str.substring_offset(7, 3);
 
 ### substring_pull
 This method returns the remainder after removing a substring from a start index for n characters to the right or left.
-As with siubstring_offset, a negative length in the second parameter will start at the start index
+It's the oposite to **substring_offset(position, length)**.
+As with **substring_offset**, a negative length in the second parameter will will end at the reference index.
 ```rust
 let sample_str = "indian-elephant";
 let result = sample_str.substring_offset(7, 3);
 // result will be "ele"
+let result = sample_str.substring_offset(6, -3);
+// result will be "ian"
 ```
 
 ### substring_insert
