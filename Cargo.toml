@@ -1,6 +1,6 @@
 [package]
 name = "substring-replace"
-version = "0.1.3"
+version = "0.1.4"
 edition = "2021"
 description = "This crate provides developer-friendly methods to extract, insert and replace strings with character indices."
 repository = "https://github.com/neilg63/substring-replace"
