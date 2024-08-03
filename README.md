@@ -141,8 +141,8 @@ let greek_words = "μήλα και πορτοκάλια";
 let search_word = "και";
 let character_index = greek_words.char_find(search_word);
 let byte_index = greek_words.find(search_word);
-println!("The word {search_word} appears at a character index of {character_index} and a byte index of {byte_index}");
-// The word $search_word appears at a character index of 7 and a byte index of 9
+println!("The word {search_word} starts at a character index of {character_index} and a byte index of {byte_index}");
+// The word $search_word starts at a character index of 5 and a byte index of 9
 ```
 
 ---
