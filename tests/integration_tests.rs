@@ -99,3 +99,26 @@ fn test_character_length() {
   assert_eq!(sample_str.char_len(), sample_str.len() / 2);
 
 }
+
+#[test]
+fn test_character_find_index() {
+  // Devanagari characters use 3 bytes each
+  let sample_str = "नमस्ते";
+  assert_eq!(sample_str.char_find("म"), Some(1));
+
+  let sample_str = "a🐕cd🐕fg";
+  assert_eq!(sample_str.char_rfind("🐕"), Some(4));
+
+  let sample_str = "আমরা সবজি দিয়ে ভাত রান্না করেছি";
+  assert_eq!(sample_str.char_rfind("ভাত"), Some(16));
+
+  let sample_str = "abc123abc123";
+  assert_eq!(sample_str.char_rfind("abc"), Some(6));
+
+  let greek_words = "μήλα και πορτοκάλια";
+  let search_word = "και";
+  let character_index = greek_words.char_find(search_word).unwrap_or(0);
+  let byte_index = greek_words.find(search_word).unwrap_or(0);
+  assert_eq!(character_index, 5);
+  assert_eq!(byte_index, 9);
+}

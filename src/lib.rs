@@ -1,5 +1,5 @@
 /// Trait with extension methods to manipulate substrings by character indices
-/// compatibile behaving like similar methods in other languages
+/// behaving like similar methods in other languages
 pub trait SubstringReplace {
 
     /// Return a substring by start and end character index
@@ -68,7 +68,7 @@ pub trait SubstringReplace {
     /// Insert a string at a given character index
     /// This differs from String::insert by using character rather than byte indices
     /// to work better with multibyte characters
-    /// It also works directly with &str, while returning a new owned string
+    /// It's also implemented for &str, while returning a new owned string
     fn substring_insert(&self, replacement: &str, start: usize) -> String {
         self.substring_replace(replacement, start, start)
     }
@@ -82,6 +82,13 @@ pub trait SubstringReplace {
     /// Return the character length rather than the byte length
     fn char_len(&self) -> usize;
 
+    /// Return the character index rather than the byte index of the first match of a pattern
+    fn char_find(&self, pat: &str) -> Option<usize>;
+
+    /// Return the character index rather than the byte index of the last match of a pattern
+    /// this will be first index of the match
+    fn char_rfind(&self, pat: &str) -> Option<usize>;
+
 }
 
 impl SubstringReplace for str {
@@ -93,7 +100,7 @@ impl SubstringReplace for str {
         &self[self.to_start_byte_index(start)..self.to_end_byte_index(end_index)]
     }
 
-    /// Replace 
+    /// Replace a segment delimited by start and end characters indices with a string pattern (&str)
     fn substring_replace(&self, replacement: &str, start: usize, end: usize) -> String {
         let end_index = if end > start { end } else { start };
         [&self[0..self.to_start_byte_index(start)], replacement, &self[self.to_end_byte_index(end_index)..]].concat()
@@ -115,6 +122,17 @@ impl SubstringReplace for str {
     /// This will differ from len() only multibyte characters
     fn char_len(&self) -> usize {
         self.char_indices().count()
+    }
+
+    /// Return the character index of the first match of a given pattern
+    fn char_find(&self, pat: &str) -> Option<usize>{
+        extract_char_index(self, pat, false)
+    }
+
+    /// Return the character index rather than the byte index of the last match of a pattern
+    /// this will be first index of the match
+    fn char_rfind(&self, pat: &str) -> Option<usize>{
+        extract_char_index(self, pat, true)
     }
 }
 
@@ -146,4 +164,44 @@ fn position_and_offset_to_start_end(position: usize, length: i32) -> (usize, usi
         end_i32 as usize
     };
     (start, end)
+}
+
+fn extract_char_index(text: &str, pat: &str, reverse: bool) -> Option<usize> {
+    let mut start_index: Option<usize> = None;
+    let pat_chars = pat.chars().collect::<Vec<_>>();
+    let pat_len = pat.char_len();
+    let text_chars = text.chars().collect::<Vec<_>>();
+    let num_text_chars = text_chars.len();
+    let range = 0..num_text_chars;
+    let mut next_pat_char_index = if reverse { pat_len - 1 } else { 0 };
+    let mut temp_pat_len = 0;
+    for tc_index in range {
+        let rel_index = if reverse { num_text_chars - 1 - tc_index } else { tc_index };
+        let tc = text_chars[rel_index];
+        if tc == pat_chars[next_pat_char_index] {
+            if !reverse && next_pat_char_index == 0 {
+                start_index = Some(rel_index);
+            }
+            if pat_len > 1 {
+                if reverse {
+                    if next_pat_char_index > 0 {
+                        next_pat_char_index -= 1;
+                    }
+                } else {
+                    next_pat_char_index += 1;
+                }
+            }
+            temp_pat_len += 1;
+        } else {
+            next_pat_char_index = if reverse { pat_len - 1 } else { 0 };
+            temp_pat_len = 0;
+        }
+        if temp_pat_len == pat_len {
+            if reverse {
+                start_index = Some(rel_index);
+            }
+            break;
+        }
+    }
+    start_index
 }

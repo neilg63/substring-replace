@@ -4,11 +4,11 @@
 
 # substring-replace: Extract, insert and replace substrings
 
-This crate adds a set of convenient methods to easily extract, insert and replace string slices in Rust with character indices compatibile with multibyte characters.
+This crate adds developer-friendly substring methods to easily manipulate string slices in Rust with character indices compatibile with multibyte characters in a similar way to *substring()* methods in Javascript, Java or C# or *substr()* in C++ and PHP.
 
-Do not add this library to your project if it already depends on the [substring](https://crates.io/crates/substring) crate. Its core substring method will conflict with the same method in the ```SubstringReplace``` trait. The like-named modules share the same signature and functionality, although this crate avoids unsafes block and will not panic if the start and end indices are out of range.
+This crate's core **substring** method has the same signature and functionality as the simpler [substring](https://crates.io/crates/substring) crate, but adds many supplementary methods, such as ```substring_replace``` and others detailed below, avoids the need for unsafe blocks and fails gracefully if start and end indices are out of range. However, the two crates should not be added to the same project. If only need the core **substring** method and already the other well-supported crate, do not install this crate. On the other hand, if you need some of extra features available from this crate, uninstall the other crate before installing this one and replace ```use substring::*;``` with ```use substring_replace::*;```.
 
-Regular Rust prefers ```str``` slices for extracting string by index ranges. However, it will panic when indices are out of range and works with byte indices rather than the more intuitive character indices as used with the [Regex](https://crates.io/crates/regex) crate. 
+Regular Rust prefers *string slices* to manipulate strings by byte index ranges. However, it panics when byte indices are out of range or fall between character boundaries. Character indices are more intuitive and compatible with the popular [Regex](https://crates.io/crates/regex) crate. 
 
 ### substring
 
@@ -133,6 +133,18 @@ println!("Emoji length: {}, emoji byte length: {}", emoji.char_len(), emoji.len(
 // prints: Emoji length: 1, emoji byte length: 4
 ```
 
+### char_find
+
+This finds the first character index of a plain string pattern. Like the standard *find* method, it returns an optional unsigned integer (usize). To search from right to left, but still returning the index of the first character in the matched sequence, you can use ```char_rfind```, 
+```rust
+let greek_words = "μήλα και πορτοκάλια";
+let search_word = "και";
+let character_index = greek_words.char_find(search_word);
+let byte_index = greek_words.find(search_word);
+println!("The word {search_word} appears at a character index of {character_index} and a byte index of {byte_index}");
+// The word $search_word appears at a character index of 7 and a byte index of 9
+```
+
 ---
 
 NB: This is an alpha release, but the crate is feature-complete and supplements [string-patterns](https://crates.io/crates/string-patterns) and [simple-string-patterns](https://crates.io/crates/simple-string-patterns) .
@@ -140,3 +152,4 @@ NB: This is an alpha release, but the crate is feature-complete and supplements 
 ### Version history
 
 **1.3:** Added new methods ```.substring_remove(start: usize, end: usize)``` and ```.substring_pull(position: usize, length: i32)```.
+**1.5:** Added new methods ```.char_find(pat: &str)``` and ```.char_rfind(pat: &str)```.
