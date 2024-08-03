@@ -152,4 +152,5 @@ NB: This is an alpha release, but the crate is feature-complete and supplements 
 ### Version history
 
 **1.3:** Added new methods ```.substring_remove(start: usize, end: usize)``` and ```.substring_pull(position: usize, length: i32)```.
+
 **1.5:** Added new methods ```.char_find(pat: &str)``` and ```.char_rfind(pat: &str)```.
