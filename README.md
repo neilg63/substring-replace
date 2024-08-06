@@ -6,9 +6,9 @@
 
 This crate adds developer-friendly substring methods to easily manipulate string slices in Rust with character indices compatibile with multibyte characters in a similar way to *substring()* methods in Javascript, Java or C# or *substr()* in C++ and PHP.
 
-This crate's core **substring** method has the same signature and functionality as the simpler [substring](https://crates.io/crates/substring) crate, but adds many supplementary methods, such as ```substring_replace``` and others detailed below, avoids the need for unsafe blocks and fails gracefully if start and end indices are out of range. However, the two crates should not be added to the same project. If you only need the core **substring** method and already use the other well-supported crate, do not install this crate. On the other hand, if you need some of extra features available from this crate, uninstall the other crate before installing this one and replace ```use substring::*;``` with ```use substring_replace::*;```.
+This crate's core **substring** method has the same signature and functionality as the simpler [substring](https://crates.io/crates/substring) crate, but adds many supplementary methods, such as ```substring_replace```, avoids the need for unsafe blocks and fails gracefully if the start or end index is out of range. However, the two crates should not be added to the same project. If you only need the core **substring** method and already use the other well-supported crate, do not install this crate. On the other hand, if you need some of extra features available from this crate, uninstall the other crate before installing this one and replace ```use substring::*;``` with ```use substring_replace::*;```.
 
-Regular Rust prefers *string slices* to manipulate strings by byte index ranges. However, it panics when byte indices are out of range or fall between character boundaries. Character indices are more intuitive and compatible with the popular [Regex](https://crates.io/crates/regex) crate. 
+Regular Rust prefers *slices* to manipulate strings by byte index ranges. However, it panics when byte indices are out of range or fall between character boundaries. Character indices are more intuitive and compatible with the popular [Regex](https://crates.io/crates/regex) crate. 
 
 ### substring
 
@@ -20,6 +20,25 @@ let result = sample_str.substring(5,9);
 // the result is "file"
 ```
 
+### substring_replace
+
+This method removes characters between the specified start and end indices and inserts a replacement string
+```rust
+let new_string = "azdefgh".substring_replace("bc", 1, 2);
+println!("{}", new_string);
+// will print "abcdefgh"
+```
+
+### substring_insert
+
+This method inserts a string at a given character index and differs from the standard ```String::insert``` method by using character rather than byte indices to work better with multibyte characters. It also works directly with ```&str```, but returns a new owned string.
+
+```rust
+let sample_str = "a/c";
+let result = sample_str.substring_insert("/b", 1);
+// result will be "a/b/c"
+```
+
 ### substring_start
 
 This will return the start of a string (```str``` or ```string```) until the specified end character index.
@@ -29,7 +48,6 @@ let result = sample_str.substring_start(5);
 // the result is "/long"
 ```
 
-
 ### substring_end
 
 This method returns the end of a string (```&str``` or ```string```) from the specified start character index.
@@ -37,16 +55,6 @@ This method returns the end of a string (```&str``` or ```string```) from the sp
 let sample_str = "/long/file/path";
 let result = sample_str.substring_start(5);
 // the result is "/file/path"
-```
-
-
-### substring_replace
-
-This method removes characters between the specified start and end indices and inserts a replacement string
-```rust
-let new_string = "azdefgh".substring_replace("bc", 1, 2);
-println!("{}", new_string);
-// will print "abcdefgh"
 ```
 
 #### substring_replace_start
@@ -97,16 +105,6 @@ let result = sample_str.substring_offset(7, 3);
 // result will be "ele"
 let result = sample_str.substring_offset(6, -3);
 // result will be "ian"
-```
-
-### substring_insert
-
-This method inserts a string at a given character index and differs from the standard ```String::insert``` method by using character rather than byte indices to work better with multibyte characters. It also works directly with ```&str```, but returns a new owned string.
-
-```rust
-let sample_str = "a/c";
-let result = sample_str.substring_insert("/b", 1);
-// result will be "a/b/c"
 ```
 
 ### to_start_byte_index

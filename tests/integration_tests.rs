@@ -52,13 +52,19 @@ fn test_replace_substring_multibyte() {
   assert_eq!(str_hi.substring_replace(repl, 0, 4), target_str);
 }
 
+/// Test substring_insert works correctly with character indices
 #[test]
 fn test_inject_substring() {
-  let sample_str = "adefg";
-  let target_str = "abcdefg";
-  assert_eq!(sample_str.substring_insert("bc", 1), target_str);
+  let sample_str_1 = "adefg";
+  let target_str_1 = "abcdefg";
+  assert_eq!(sample_str_1.substring_insert("bc", 1), target_str_1);
+
+  let sample_str_2 = "a🐫defg";
+  let target_str_2 = "a🐫bcdefg";
+  assert_eq!(sample_str_2.substring_insert("bc", 2), target_str_2);
 }
 
+/// Test substring_remove and substring_pull remove the correct characters
 #[test]
 fn test_substring_remove() {
   let sample_str = "abcdefg";
@@ -78,6 +84,7 @@ fn test_substring_replace_start_end() {
   assert_eq!(sample_str.substring_replace_end(extra, 3), "abcxyz");
 }
 
+/// Test char_len() with a range of multibyte characters
 #[test]
 fn test_character_length() {
   // Devanagari characters use 3 bytes each
@@ -100,6 +107,7 @@ fn test_character_length() {
 
 }
 
+/// Test char_find and char_rfind with a range of multibyte characters
 #[test]
 fn test_character_find_index() {
   // Devanagari characters use 3 bytes each
