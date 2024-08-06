@@ -2,6 +2,7 @@ use substring_replace::*;
 
 #[cfg(test)]
 
+/// Test substring works as expected with &str and string types
 #[test]
 fn test_extract_substring() {
     let sample_str = "We can't solve today's problems.";
@@ -10,6 +11,7 @@ fn test_extract_substring() {
     assert_eq!(sample_str.to_string().substring(9, 14), "solve");
 }
 
+/// Test substring fails gracefully with out-of-range start or end indices
 #[test]
 fn test_extract_substring_overflow() {
     let sample_str = "Thinking is hard work.";
@@ -31,6 +33,7 @@ fn test_extract_substring_offset() {
     assert_eq!(sample_str.substring_offset(13, -3), "est");
 }
 
+/// Test substring_replace with single-byte characters
 #[test]
 fn test_replace_substring() {
   let sample_str = "We can't solve today's problems.";
@@ -38,6 +41,7 @@ fn test_replace_substring() {
   assert_eq!(sample_str.substring_replace("cannot", 3, 8), target_str);
 }
 
+/// Test substring_replace with multibyte characters
 #[test]
 fn test_replace_substring_multibyte() {
   let str_ar = "مرحبًا أحمد";
