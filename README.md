@@ -53,7 +53,7 @@ let result = sample_str.substring_start(5);
 This method returns the end of a string (```&str``` or ```string```) from the specified start character index.
 ```rust
 let sample_str = "/long/file/path";
-let result = sample_str.substring_start(5);
+let result = sample_str.substring_end(5);
 // the result is "/file/path"
 ```
 
