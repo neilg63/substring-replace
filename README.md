@@ -96,7 +96,7 @@ let result = sample_str.substring_offset(7, 3);
 ```
 
 ### substring_pull
-This method returns the remainder after removing a substring from a start index for n characters to the right or left.
+This method returns the remainder after removing a substring from a start index for *n* characters to the right or left.
 It's the oposite to **substring_offset(position, length)**.
 As with **substring_offset**, a negative length in the second parameter will will end at the reference index.
 ```rust
@@ -107,19 +107,14 @@ let result = sample_str.substring_offset(6, -3);
 // result will be "ian"
 ```
 
-### to_start_byte_index
+### to_start_byte_index and to_end_byte_index
 
-This convert a start character index to a start byte index. It's mainly used internally.
-It differs only from the ```to_end_byte_index``` in its default value of 0 if it overflows.
+Theses methods convert either a start character index into a start byte index or an end character index into an end byte index. They're mainly used internally to build a string slice.
+They differ only in their default value. For ```to_start_byte_index``` the default value is 0, while for  ```to_end_byte_index``` it's the endmost index.
 ```rust
 let byte_index = "नमस्ते".to_start_byte_index(2);
 // yields byte index of at the start of third multibyte character (character index 2). It should be 6
 ```
-
-### to_end_byte_index
-
-This method converts an end character index to an end byte index. It's mainly used internally.
-It differs only from the ```to_end_byte_index``` in its default value at the end if it overflows.
 
 ### char_len
 
