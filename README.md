@@ -98,13 +98,11 @@ let result = sample_str.substring_offset(7, 3);
 ### substring_pull
 This method returns the remainder after removing a substring from a start index for *n* characters to the right or left.
 It's the oposite to **substring_offset(position, length)**.
-As with **substring_offset**, a negative length in the second parameter will will end at the reference index.
+As with **substring_offset**, a negative length in the second parameter will end at the reference index.
 ```rust
-let sample_str = "indian-elephant";
-let result = sample_str.substring_offset(7, 3);
-// result will be "ele"
-let result = sample_str.substring_offset(6, -3);
-// result will be "ian"
+let sample_str = "three-horse-race";
+let result = sample_str.substring_pull(5, 6);
+// result will be "three-race"
 ```
 
 ### to_start_byte_index and to_end_byte_index

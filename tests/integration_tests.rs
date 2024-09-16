@@ -77,6 +77,10 @@ fn test_substring_remove() {
   assert_eq!(sample_str.substring_pull(3, -2), "adefg");
   // remove 2 characters from index 3
   assert_eq!(sample_str.substring_pull(3, 2), "abcfg");
+
+  let sample_str = "three-horse-race";
+  let result = sample_str.substring_pull(5, 6);
+  assert_eq!(result, "three-race");
 }
 
 
