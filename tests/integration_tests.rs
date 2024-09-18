@@ -54,6 +54,12 @@ fn test_replace_substring_multibyte() {
   let repl = "नीली";
   let target_str = "नीली साड़ी";
   assert_eq!(str_hi.substring_replace(repl, 0, 4), target_str);
+
+  let date_str = "2024-09-15T14:43:32.123Z";
+  let repl = "15:17:54";
+  let target_str = "2024-09-15T15:17:54.123Z";
+  
+  assert_eq!(date_str.substring_replace_range(repl, 11, -5), target_str);
 }
 
 /// Test substring_insert works correctly with character indices
@@ -151,5 +157,5 @@ fn test_substring_start_end() {
   assert_eq!(result, "/long/file/");
 
   let result = sample_str.substring_range(5,-5);
-  assert_eq!(result, "file");
+  assert_eq!(result, "/file");
 }

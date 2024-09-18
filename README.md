@@ -143,4 +143,4 @@ NB: This is an alpha release, but the crate is feature-complete and supplements 
 
 **1.5:** Added new methods ```.char_find(pat: &str)``` and ```.char_rfind(pat: &str)```.
 
-**2.0:** The last parameter of ```.substring_start(end: i64)```, ```.substring_end(start: i64)```, ```.substring_replace_start(replacement: &str, end: i64)``` and ```.substring_replace_end(replacement: &str, start: i64)``` is now a 64-bit integer to let you assign a negative index as character offset from the end, e.g. "abcdefghi".substring_end(-3) would yield "ghi".
+**2.0:** The last parameter of ```.substring_start(end: i64)```, ```.substring_end(start: i64)```, ```.substring_replace_start(replacement: &str, end: i64)``` and ```.substring_replace_end(replacement: &str, start: i64)``` is now a 64-bit integer to let you assign a negative index as character offset from the end, e.g. "abcdefghi".substring_end(-3) would yield "ghi". Two new variant methods that accept negative end offsets were also introduced: ```substring_range(start; usize, end: i64)``` and ```substring_replace_range(replacement: &str, start; usize, end: i64)```. 
