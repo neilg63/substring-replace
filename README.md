@@ -61,7 +61,7 @@ let result_3 = sample_str.substring_end(-4);
 
 ### substring_replace_start, substring_replace_end and substring_replace_range
 
-*substring_replace_start* replaces the start of a string to a specified end character index, while *substring_replace_end* replaces the remainder of string from a specified start character index. like *substring_replace*, *substring_replace_range*, accepts a start and end range, but the end parameter may have a negative value.
+*substring_replace_start* replaces the start of a string to a specified end character index, while *substring_replace_end* replaces the remainder of string from a specified start character index. Like *substring_replace* described above, *substring_replace_range* accepts a *start* and *end* range, but the *end* parameter may have a negative value.
 In all three methods, a negative index value in the last parameter means that many characters before the end of the string, e.g. if the character length is 15, -5 translates to 10
 ```rust
 // remove the first 2 characters and prepend the string "xyz"
@@ -69,9 +69,15 @@ let new_string = "abcdefgh".substring_replace_start("xyz", 2);
 println!("{}", new_string);
 // will print "xyzcdefgh"
 
+let new_string = "abcdefgh".substring_replace_end("xyz", 3);
 // remove all characters after and index of 3 and append the string "xyz"
 println!("{}", new_string);
 // will print "abcxyz"
+
+let new_string = "abcdefgh".substring_replace_range("_xyz_", 2, -2);
+// replace all characters after the first two and before the last 2
+println!("{}", new_string);
+// will print "ab_xyz_gh"
 ```
 
 ### substring_remove
