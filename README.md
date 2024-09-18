@@ -39,40 +39,36 @@ let result = sample_str.substring_insert("/b", 1);
 // result will be "a/b/c"
 ```
 
-### substring_start
+### substring_start and substring_end
 
-This will return the start of a string (```str``` or ```string```) until the specified end character index.
+*substring_start* returns the start of a string (```str``` or ```string```) until the specified end character index, 
+while *substring_end* returns the end of a string (```&str``` or ```string```) from the specified start character index.
+A negative offset represents character index from the end, e.g. if if char length is 15, -5 translates to 10.
+This is useful with *substring_end* when you know how many characters you need to capture, but do not want to check the string character length first and with *substring_start* when you know how many characters you need to remove from the end.
+
 ```rust
 let sample_str = "/long/file/path";
-let result = sample_str.substring_start(5);
+let result_1 = sample_str.substring_start(5);
 // the result is "/long"
-```
 
-### substring_end
-
-This method returns the end of a string (```&str``` or ```string```) from the specified start character index.
-```rust
-let sample_str = "/long/file/path";
-let result = sample_str.substring_end(5);
+let result_2 = sample_str.substring_end(5);
 // the result is "/file/path"
+
+let result_3 = sample_str.substring_end(-4);
+// the result is "path"
 ```
 
-#### substring_replace_start
+### substring_replace_start and substring_replace_end
 
-This method replaces the start of a string to a specified end character index
+*substring_replace_start* replaces the start of a string to a specified end character index, while *substring_replace_end* replaces the remainder of string from a specified start character index.
+In both methods, a negative index value means that many characters before the end of the string, e.g. if if char length is 15, -5 translates to 10.
 ```rust
 // remove the first 2 characters and prepend the string "xyz"
 let new_string = "abcdefgh".substring_replace_start("xyz", 2);
 println!("{}", new_string);
 // will print "xyzcdefgh"
-```
 
-#### substring_replace_end
-
-This method replaces the remainder of string from a specified start character index
-```rust
 // remove all characters after and index of 3 and append the string "xyz"
-let new_string = "abcdefgh".substring_replace_end("xyz", 3);
 println!("{}", new_string);
 // will print "abcxyz"
 ```
@@ -145,3 +141,5 @@ NB: This is an alpha release, but the crate is feature-complete and supplements 
 **1.3:** Added new methods ```.substring_remove(start: usize, end: usize)``` and ```.substring_pull(position: usize, length: i32)```.
 
 **1.5:** Added new methods ```.char_find(pat: &str)``` and ```.char_rfind(pat: &str)```.
+
+**2.0:** The last parameter of ```.substring_start(end: i64)```, ```.substring_end(start: i64)```, ```.substring_replace_start(replacement: &str, end: i64)``` and ```.substring_replace_end(replacement: &str, start: i64)``` is now a 64-bit integer to let you assign a negative index as character offset from the end, e.g. "abcdefghi".substring_end(-3) would yield "ghi".

@@ -8,16 +8,20 @@ pub trait SubstringReplace {
     fn substring(&self, start: usize, end: usize) -> &str;
 
     /// Return a substring from the start and to a specified end character index
-    fn substring_start(&self, end: usize) -> &str {
-        self.substring(0, end)
+    fn substring_start(&self, end: i64) -> &str {
+        let end_index = if end < 0 { self.char_len().checked_sub(end.abs() as usize).unwrap_or(0) } else { end as usize };
+        self.substring(0, end_index)
     }
 
     /// Return a substring from a specified start character index to a specified end
+    /// A negative offset represents character index from the end, e.g. if character length is 15, -5 translates to 10
     /// If start index is greater than the max character index, the function will yield an empty string
-    fn substring_end(&self, start: usize) -> &str {
+    fn substring_end(&self, start: i64) -> &str {
         let max_index = self.char_len();
-        self.substring(start, max_index)
+        let start_index = if start < 0 { max_index.checked_sub(start.abs() as usize).unwrap_or(0) } else { start as usize };
+        self.substring(start_index, max_index)
     }
+
 
     // Replace substring delimited by start and end character index
     // with any string (&str)
@@ -28,16 +32,20 @@ pub trait SubstringReplace {
     /// Replace the start of a string to specified end character index
     /// e.g. "brown".substring_replace_start("d", 2);
     /// will replace the first two characters with "d", yield "down"
-    fn substring_replace_start(&self, replacement: &str, end: usize) -> String {
-        self.substring_replace(replacement, 0, end)
+    /// A negative offset represents character index from the end, e.g. if character length is 15, -5 translates to 10
+    fn substring_replace_start(&self, replacement: &str, end: i64) -> String {
+        let end_index = if end < 0 { self.char_len().checked_sub(end.abs() as usize).unwrap_or(0) } else { end as usize };
+        self.substring_replace(replacement, 0, end_index)
     }
 
     /// Replace the remainder of string from a specified start character index
     /// e.g. "blue".substring_replace_last("ack", 2);
     /// will replace the last 2 characters with "ack", yielding "black"
-    fn substring_replace_end(&self, replacement: &str, start: usize) -> String {
+    /// A negative offset represents character index from the end, e.g. if character length is 15, -5 translates to 10
+    fn substring_replace_end(&self, replacement: &str, start: i64) -> String {
         let end = self.char_len();
-        self.substring_replace(replacement, start, end)
+        let start_index = if start < 0 { end.checked_sub(start.abs() as usize).unwrap_or(0) } else { start as usize };
+        self.substring_replace(replacement, start_index, end)
     }
 
     /// Remove a string delimited by a start and end character index
