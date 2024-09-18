@@ -141,7 +141,7 @@ fn test_character_find_index() {
 
 
 #[test]
-fn test_substring_end() {
+fn test_substring_start_end() {
   let sample_str = "/long/file/path";
   let result = sample_str.substring_end(5);
   assert_eq!(result, "/file/path");
@@ -149,4 +149,7 @@ fn test_substring_end() {
   assert_eq!(result, "path");
   let result = sample_str.substring_start(-4);
   assert_eq!(result, "/long/file/");
+
+  let result = sample_str.substring_range(5,-5);
+  assert_eq!(result, "file");
 }

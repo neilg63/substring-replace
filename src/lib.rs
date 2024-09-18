@@ -22,11 +22,27 @@ pub trait SubstringReplace {
         self.substring(start_index, max_index)
     }
 
+    /// Return a substring by start and end character index
+    /// Unlike the default substring() method, the end index may be negative,
+    /// in which case it counts backwards from the end, e.g. if character length is 15, -5 translates to 10
+    fn substring_range(&self, start: usize, end: i64) -> &str {
+        let end_index = if end < 0 { self.char_len().checked_sub(end.abs() as usize).unwrap_or(0) } else { end as usize };
+        self.substring(start, end_index)
+    }
+
 
     // Replace substring delimited by start and end character index
     // with any string (&str)
     // To inject a string use substring_insert()
     fn substring_replace(&self, replacement: &str, start: usize, end: usize) -> String;
+
+    /// Replace substring delimited by start and end character index
+    /// Unlike the default substring_replace() method, the end index may be negative,
+    /// in which case it counts backwards from the end, e.g. if character length is 15, -5 translates to 10
+    fn substring_replace_range(&self, replacement: &str, start: usize, end: i64) -> String {
+        let end_index = if end < 0 { self.char_len().checked_sub(end.abs() as usize).unwrap_or(0) } else { end as usize };
+        self.substring_replace(replacement, start, end_index)
+    }
 
 
     /// Replace the start of a string to specified end character index

@@ -39,11 +39,12 @@ let result = sample_str.substring_insert("/b", 1);
 // result will be "a/b/c"
 ```
 
-### substring_start and substring_end
+### substring_start, substring_end and substring_range
 
 *substring_start* returns the start of a string (```str``` or ```string```) until the specified end character index, 
 while *substring_end* returns the end of a string (```&str``` or ```string```) from the specified start character index.
-A negative offset represents character index from the end, e.g. if if char length is 15, -5 translates to 10.
+Like the standard *substring* method, "substring_range" accepts a start and end range, but the end index may be negative.
+A negative offset represents character index from the end, e.g. if the character length is 15, -5 translates to 10.
 This is useful with *substring_end* when you know how many characters you need to capture, but do not want to check the string character length first and with *substring_start* when you know how many characters you need to remove from the end.
 
 ```rust
@@ -58,10 +59,10 @@ let result_3 = sample_str.substring_end(-4);
 // the result is "path"
 ```
 
-### substring_replace_start and substring_replace_end
+### substring_replace_start, substring_replace_end and substring_replace_range
 
-*substring_replace_start* replaces the start of a string to a specified end character index, while *substring_replace_end* replaces the remainder of string from a specified start character index.
-In both methods, a negative index value means that many characters before the end of the string, e.g. if if char length is 15, -5 translates to 10.
+*substring_replace_start* replaces the start of a string to a specified end character index, while *substring_replace_end* replaces the remainder of string from a specified start character index. like *substring_replace*, *substring_replace_range*, accepts a start and end range, but the end parameter may have a negative value.
+In all three methods, a negative index value in the last parameter means that many characters before the end of the string, e.g. if the character length is 15, -5 translates to 10
 ```rust
 // remove the first 2 characters and prepend the string "xyz"
 let new_string = "abcdefgh".substring_replace_start("xyz", 2);
