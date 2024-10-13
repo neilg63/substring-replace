@@ -4,4 +4,13 @@ version = 3
 
 [[package]]
 name = "substring-replace"
-version = "0.2.0"
+version = "0.2.1"
+dependencies = [
+ "to-offset",
+]
+
+[[package]]
+name = "to-offset"
+version = "0.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4e27b21422b51cc25582323e9c6afa186ca5e6045a164c606a959724ef8b971a"

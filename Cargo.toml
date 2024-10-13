@@ -1,10 +1,11 @@
 [package]
 name = "substring-replace"
-version = "0.2.0"
+version = "0.2.1"
 edition = "2021"
 description = "This crate provides developer-friendly methods to manipulate strings with character indices."
 repository = "https://github.com/neilg63/substring-replace"
-categories = ["text-processing", "parsing"]
+categories = ["data-processing", "parsing"]
 license = "GPL-2.0-or-later WITH Bison-exception-2.2"
 
 [dependencies]
+to-offset = "0.0.1"

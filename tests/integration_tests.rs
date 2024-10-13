@@ -11,12 +11,20 @@ fn test_extract_substring() {
     assert_eq!(sample_str.to_string().substring(9, 14), "solve");
 }
 
+/// Test substring works as expected with &str and string types
+#[test]
+fn test_negative_offset() {
+  let sample_str = "2024-10-12T17:32:43.00Z";
+  let expected_result = "10-12T17:32:43";
+  
+    assert_eq!(sample_str.substring(5,-4), expected_result);
+}
+ 
 /// Test substring fails gracefully with out-of-range start or end indices
 #[test]
 fn test_extract_substring_overflow() {
     let sample_str = "Thinking is hard work.";
     assert_eq!(sample_str.substring(9, 50), "is hard work.");
-
     assert_eq!(sample_str.substring(9, 3), "");
 }
 
@@ -59,7 +67,7 @@ fn test_replace_substring_multibyte() {
   let repl = "15:17:54";
   let target_str = "2024-09-15T15:17:54.123Z";
   
-  assert_eq!(date_str.substring_replace_range(repl, 11, -5), target_str);
+  assert_eq!(date_str.substring_replace(repl, 11, -5), target_str);
 }
 
 /// Test substring_insert works correctly with character indices
@@ -159,3 +167,19 @@ fn test_substring_start_end() {
   let result = sample_str.substring_range(5,-5);
   assert_eq!(result, "/file");
 }
+
+
+#[test]
+fn test_substring_insert_adjacent() {
+  let sample_str = "long-file-name.revised.jpg";
+  let result = sample_str.insert_before_last("-123", ".");
+  let target_str = "long-file-name.revised-123.jpg";
+  assert_eq!(result, target_str);
+  let result = sample_str.insert_after_first("document-", "-");
+  let target_str = "long-document-file-name.revised.jpg";
+  assert_eq!(result, target_str);
+  let result = sample_str.insert_between("document", "-", ".");
+  let target_str = "long-document.jpg";
+  assert_eq!(result, target_str);
+}
+ 
