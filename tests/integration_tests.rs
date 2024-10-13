@@ -17,7 +17,7 @@ fn test_negative_offset() {
   let sample_str = "2024-10-12T17:32:43.00Z";
   let expected_result = "10-12T17:32:43";
   
-    assert_eq!(sample_str.substring(5,-4), expected_result);
+  assert_eq!(sample_str.substring(5,-4), expected_result);
 }
  
 /// Test substring fails gracefully with out-of-range start or end indices
@@ -163,8 +163,8 @@ fn test_substring_start_end() {
   assert_eq!(result, "path");
   let result = sample_str.substring_start(-4);
   assert_eq!(result, "/long/file/");
-
-  let result = sample_str.substring_range(5,-5);
+  // alows negative offset
+  let result = sample_str.substring(5,-5);
   assert_eq!(result, "/file");
 }
 
