@@ -120,9 +120,10 @@ let new_file_name = file_name.insert_before_last("--cropped", ".");
 
 ---
 
-NB: This is an alpha release, but the crate is feature-complete and supplements [string-patterns](https://crates.io/crates/string-patterns) and [simple-string-patterns](https://crates.io/crates/simple-string-patterns) .
 
 ### Version history
+
+***0.2.2** Switched to MIT licence.
 
 **0.1.3:** Added new methods `.substring_remove(start: usize, end: usize)` and `.substring_pull(position: usize, length: i32)`.
 
