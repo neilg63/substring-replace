@@ -1,6 +1,6 @@
 [package]
 name = "substring-replace"
-version = "0.2.3"
+version = "0.2.4"
 edition = "2021"
 description = "This crate provides developer-friendly methods to manipulate strings with character indices."
 repository = "https://github.com/neilg63/substring-replace"
@@ -9,3 +9,10 @@ license = "MIT"
 
 [dependencies]
 to-offset = "0.1.1"
+
+[dev-dependencies]
+criterion = "0.5"
+
+[[bench]]
+name = "insert_before_last"
+harness = false

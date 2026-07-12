@@ -2,7 +2,7 @@ pub use to_offset::*;
 
 /// Trait with extension methods to manipulate substrings by character indices
 /// behaving like similar methods in other languages
-pub trait SubstringReplace where Self:ToString {
+pub trait SubstringReplace where Self: AsRef<str> {
 
     /// Return a substring by start and end character index
     /// With multibyte characters this will not be the same as the byte indices
@@ -145,28 +145,28 @@ pub trait SubstringReplace where Self:ToString {
                 return self.substring_replace(insert, start_index + 1, end_index);
             }
         }
-        self.to_string()
+        self.as_ref().to_string()
     }
 
     /// Insert between the first occurrence of a one string and the last occurrence of another
     fn prepend(&self, insert: &str) -> String {
-        [insert.to_string(), self.to_string()].concat()
+        [insert.to_string(), self.as_ref().to_string()].concat()
     }
 
     fn append(&self, insert: &str) -> String {
-        [self.to_string(), insert.to_string()].concat()
+        [self.as_ref().to_string(), insert.to_string()].concat()
     }
 
 }
 
-impl SubstringReplace for str {
+impl<S: AsRef<str>> SubstringReplace for S {
 
     /// Extract substring by character indices and hand overflow gracefully
-    /// if the end index is equal or greater than start index, the function will yield an empty string 
+    /// if the end index is equal or greater than start index, the function will yield an empty string
     fn substring<T: ToOffset>(&self, start: usize, end: T) -> &str {
         let end_index = end.to_offset(self.char_len());
         if end_index > start {
-            &self[self.to_start_byte_index(start)..self.to_end_byte_index(end_index)]
+            &self.as_ref()[self.to_start_byte_index(start)..self.to_end_byte_index(end_index)]
         } else {
             ""
         }
@@ -175,41 +175,42 @@ impl SubstringReplace for str {
     /// Replace a segment delimited by start and end characters indices with a string pattern (&str)
     fn substring_replace<T: ToOffset>(&self, replacement: &str, start: usize, end: T) -> String {
         let end_index = end.to_offset(self.char_len());
-        [&self[0..self.to_start_byte_index(start)], replacement, &self[self.to_end_byte_index(end_index)..]].concat()
+        let text = self.as_ref();
+        [&text[0..self.to_start_byte_index(start)], replacement, &text[self.to_end_byte_index(end_index)..]].concat()
     }
 
     /// Translate the character start index to the start byte index
     /// to avoid boundary collisions with multibyte characters
     fn to_start_byte_index(&self, start: usize) -> usize {
-        char_index_to_byte_index(self, start, false)
+        char_index_to_byte_index(self.as_ref(), start)
     }
 
     /// Translate the character end index to the end byte index
     /// to avoid boundary collisions with multibyte characters
     fn to_end_byte_index(&self, end: usize) -> usize {
-        char_index_to_byte_index(self, end, true)
+        char_index_to_byte_index(self.as_ref(), end)
     }
 
     /// Return the character length as opposed to the byte length
     /// This will differ from len() only multibyte characters
     fn char_len(&self) -> usize {
-        self.char_indices().count()
+        self.as_ref().char_indices().count()
     }
 
     /// Return the character index of the first match of a given pattern
     fn char_find(&self, pat: &str) -> Option<usize>{
-        extract_char_index(self, pat, false)
+        extract_char_index(self.as_ref(), pat, false)
     }
 
     /// Return the character index rather than the byte index of the last match of a pattern
     /// this will be first index of the match
     fn char_rfind(&self, pat: &str) -> Option<usize>{
-        extract_char_index(self, pat, true)
+        extract_char_index(self.as_ref(), pat, true)
     }
 
     /// Insert before or after the first or last occurrence
     fn insert_adjacent(&self, insert: &str, pat: &str, before: bool, first: bool) -> String {
-        if let Some(index) = extract_char_index(self, pat, !first) {
+        if let Some(index) = extract_char_index(self.as_ref(), pat, !first) {
             let rel_index = if before {
                 index
             } else {
@@ -217,17 +218,18 @@ impl SubstringReplace for str {
             };
             self.substring_insert(insert, rel_index)
         } else {
-            self.to_string()
+            self.as_ref().to_string()
         }
     }
 }
 
 /*
 * private function to convert a character index to byte index requied by &str slices
+* an index at or beyond the character length always maps to the end of the string,
+* whether it is used as a start or end boundary
 */
-fn char_index_to_byte_index(text: &str, char_index: usize, to_end: bool) -> usize {
-    let default_index = if to_end { text.len() } else { 0 };
-    text.char_indices().nth(char_index).map(|(i, _)| i).unwrap_or(default_index)
+fn char_index_to_byte_index(text: &str, char_index: usize) -> usize {
+    text.char_indices().nth(char_index).map(|(i, _)| i).unwrap_or(text.len())
 }
 
 /*
@@ -252,43 +254,13 @@ fn position_and_offset_to_start_end(position: usize, length: i32) -> (usize, usi
     (start, end)
 }
 
-/// private function to extract the character index of pattenr (char sequence)
+/// private function to extract the character index of the start of the first or last
+/// occurrence of a pattern (char sequence)
+/// An empty pattern has nothing to match, so it never yields an index
 fn extract_char_index(text: &str, pat: &str, reverse: bool) -> Option<usize> {
-    let mut start_index: Option<usize> = None;
-    let pat_chars = pat.chars().collect::<Vec<_>>();
-    let pat_len = pat.char_len();
-    let text_chars = text.chars().collect::<Vec<_>>();
-    let num_text_chars = text_chars.len();
-    let range = 0..num_text_chars;
-    let mut next_pat_char_index = if reverse { pat_len - 1 } else { 0 };
-    let mut temp_pat_len = 0;
-    for tc_index in range {
-        let rel_index = if reverse { num_text_chars - 1 - tc_index } else { tc_index };
-        let tc = text_chars[rel_index];
-        if tc == pat_chars[next_pat_char_index] {
-            if !reverse && next_pat_char_index == 0 {
-                start_index = Some(rel_index);
-            }
-            if pat_len > 1 {
-                if reverse {
-                    if next_pat_char_index > 0 {
-                        next_pat_char_index -= 1;
-                    }
-                } else {
-                    next_pat_char_index += 1;
-                }
-            }
-            temp_pat_len += 1;
-        } else {
-            next_pat_char_index = if reverse { pat_len - 1 } else { 0 };
-            temp_pat_len = 0;
-        }
-        if temp_pat_len == pat_len {
-            if reverse {
-                start_index = Some(rel_index);
-            }
-            break;
-        }
+    if pat.is_empty() {
+        return None;
     }
-    start_index
+    let byte_index = if reverse { text.rfind(pat) } else { text.find(pat) };
+    byte_index.map(|bi| text[..bi].chars().count())
 }
