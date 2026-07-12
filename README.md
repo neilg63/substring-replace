@@ -8,9 +8,7 @@ This crate adds intuitive substring methods for manipulating Rust strings with c
 
 ## Features
 
-- **Core `substring` Method**: Compatible with the simpler [substring](https://crates.io/crates/substring) crate but includes additional safe handling for out-of-range indices and negative offsets.
-
-- **Avoiding Conflicts**: Do not use this crate alongside the existing `substring` crate. If you need advanced features, replace `use substring::*;` with `use substring_replace::*;` after removing the `substring` dependency.
+- **Do not use this crate alongside `substring`**: [substring](https://crates.io/crates/substring) is a fine, minimal choice if all you'll ever need is a single `substring(start, end)` extraction with no negative offsets — it indexes by character (Unicode Scalar Value) too, so the two crates share the same philosophy, not just the same name. But don't import both traits into the same scope. Negative offsets (`"abcdefghi".substring(0, -3)` → `"abcdef"`) are a deliberate feature of this crate's `substring()`, not an afterthought — and both traits define a method literally called `substring`, so if both are in scope, plain `.substring(a, b)` calls silently resolve to the `substring` crate's narrower `fn substring(&self, usize, usize)` instead of this crate's `fn substring<T: ToOffset>(&self, usize, T)`, silently discarding negative-offset support with no error or warning. If you need `substring_replace`, `substring_insert`, `substring_remove`, `substring_pull`, the `insert_before_*`/`insert_after_*`/`insert_between` family, or negative offsets anywhere in your code, use this crate on its own and drop the `substring` dependency entirely.
 
 - **Character vs Byte Indices**: Unlike Rust's standard string slicing by byte indices, this crate uses character indices for intuitive handling, especially with Unicode.
 
@@ -18,18 +16,41 @@ This crate adds intuitive substring methods for manipulating Rust strings with c
 
 - **No regular expressions**: Every method matches literal substrings only. That's deliberate — this crate is for predictable, fixed patterns (file names, delimiters, extensions), not general pattern matching. If you need character classes, alternation or quantifiers, reach for the `regex` crate instead.
 
+- **100% safe Rust**: `#![forbid(unsafe_code)]` at the crate root — every method, including the multibyte-boundary handling, is implemented with ordinary safe slicing. (By contrast, the `substring` crate above reaches for `unsafe { self.slice_unchecked(...) }` internally to get the same guarantee.)
+
 ## Key Methods
 
-### `substring<T: ToOffset>(start: usize, end: T) -> &str`
+### `substring<S: ToOffset, E: ToOffset>(start: S, end: E) -> &str`
 
-Extracts a substring based on character indices. `end` accepts any integer type implementing `ToOffset` (`i32`, `i64`, `u8`, `u16`, `u32`, `u64`, `usize`); a negative value counts back from the end of the string.
+Extracts a substring based on character indices. Both `start` and `end` accept any integer type implementing `ToOffset` (`i32`, `i64`, `u8`, `u16`, `u32`, `u64`, `usize`) independently; a negative value on either one counts back from the end of the string.
 
 ```rust
 let sample_str = "/long/file/path";
 assert_eq!(sample_str.substring(6, 10), "file");
 ```
 
-### `substring_replace<T: ToOffset>(replacement: &str, start: usize, end: T) -> String`
+A positive start with a negative end is what makes this useful on strings whose length you don't know in advance — e.g. trimming a fixed number of characters off both sides regardless of overall length:
+
+```rust
+// strip 3 characters from each end, whatever the string's length turns out to be
+assert_eq!("abcdefghi".substring(3, -3), "def");
+assert_eq!("abcdefghijklmnop".substring(3, -3), "defghijklm");
+
+// and it degrades gracefully rather than panicking when the string is too short
+assert_eq!("ab".substring(3, -3), "");
+```
+A hand-rolled equivalent (`s.chars().count() - 3` as the end index) has to be recomputed against the actual length every time, and panics with a subtract-overflow on any string shorter than the combined trim amount — `substring`'s offsets are resolved once, safely, per call.
+
+A negative *start* works too, for the mirror-image case: a fixed-length suffix with a variable-length prefix, where what you want is a fixed number of characters just *before* that suffix.
+
+```rust
+// every file here ends in a 4-character ".pdf" suffix; capture the 3 characters before it,
+// regardless of how long the rest of the file name is
+assert_eq!("report_v2.pdf".substring(-7, -4), "_v2");
+assert_eq!("annual_financial_report_v2.pdf".substring(-7, -4), "_v2");
+```
+
+### `substring_replace<S: ToOffset, E: ToOffset>(replacement: &str, start: S, end: E) -> String`
 
 Replaces a substring with another, using character indices.
 
@@ -92,11 +113,30 @@ assert_eq!(byte_index, 6); // each Devanagari character in this word is 3 bytes
 
 ### `char_len() -> usize`
 
-Returns the character count of a string.
+Returns the character count of a string — the number of Unicode *scalar values* (what `.chars()` iterates over), not the byte length.
 
 ```rust
 println!("{}", "😎".char_len()); // prints 1
+
+// bytes and characters diverge as soon as a character needs more than one byte —
+// 'é' alone is 2 bytes in UTF-8, but it's still 1 character:
+assert_eq!("café".len(), 5);
+assert_eq!("café".char_len(), 4);
+
+// the gap grows with more multibyte text...
+assert_eq!("नमस्ते".len(), 18);
+assert_eq!("नमस्ते".char_len(), 6);
+
+// ...and one further wrinkle: a single visible glyph can itself be more than one
+// scalar value. "⚽️" is the base emoji (U+26BD) plus an invisible variation
+// selector (U+FE0F), so it counts as 2 characters, not 1:
+assert_eq!("7⚽️".len(), 7);       // bytes
+assert_eq!("7⚽️".char_len(), 3);  // '7', the emoji, and the variation selector
 ```
+
+This is the whole reason `char_len()` — and every offset in this crate — exists: `.len()` is meaningless as a character count for anything beyond ASCII, the standard library has no built-in equivalent, and re-deriving `.chars().count()` by hand before every `substring()` call (and re-checking it every time the string's length changes) is exactly the friction this crate removes.
+
+One honest caveat: `char_len()` counts Unicode scalar values, not grapheme clusters (what a human would casually call "one character"). A variation selector, combining accent, or ZWJ emoji sequence counts as multiple characters even though it renders as a single glyph — hence `"7⚽️".char_len()` being 3, not 2. If you need grapheme-cluster-aware indexing, reach for the `unicode-segmentation` crate; this crate, like `substring` alongside it, deliberately stays at the scalar-value level.
 
 ### `char_find(pattern: &str) -> Option<usize>` and `char_rfind(pattern: &str) -> Option<usize>`
 
@@ -147,7 +187,7 @@ assert_eq!("hello".append(" world"), "hello world");
 
 ### Version history
 
-**0.2.4** The trait is now implemented generically for any `T: AsRef<str>` (`&str`, `String`, `Cow<str>`, `Box<str>`, etc.) rather than `&str` alone. Fixed three bugs: `char_find`/`char_rfind` could return the wrong index — or a false match — for patterns with a repeated leading character; an empty search pattern caused a panic (now returns `None`); and inserting or replacing exactly at the end of a string silently discarded the preceding content.
+**0.2.4** The trait is now implemented generically for any `T: AsRef<str>` (`&str`, `String`, `Cow<str>`, `Box<str>`, etc.) rather than `&str` alone. `substring` and `substring_replace` now accept a negative `start` index as well as `end` — `start` and `end` are independent generic parameters, each accepting any `ToOffset` integer type (`usize`, `u32`, `i64`, etc.), so you can capture a fixed number of characters immediately before a fixed-length suffix on a variable-length string, e.g. `"report_v2.pdf".substring(-7, -4)` → `"_v2"`. Fixed three bugs: `char_find`/`char_rfind` could return the wrong index — or a false match — for patterns with a repeated leading character; an empty search pattern caused a panic (now returns `None`); and inserting or replacing exactly at the end of a string silently discarded the preceding content. The crate is also now `#![forbid(unsafe_code)]`.
 
 **0.2.2** Switched to MIT licence.
 

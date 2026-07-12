@@ -1,3 +1,5 @@
+#![forbid(unsafe_code)]
+
 pub use to_offset::*;
 
 /// Trait with extension methods to manipulate substrings by character indices
@@ -7,7 +9,9 @@ pub trait SubstringReplace where Self: AsRef<str> {
     /// Return a substring by start and end character index
     /// With multibyte characters this will not be the same as the byte indices
     /// used by str slices
-    fn substring<T: ToOffset>(&self, start: usize, end: T) -> &str;
+    /// Both start and end accept negative offsets counting back from the end of the string,
+    /// e.g. "abcdefghi".substring(-7, -4) returns the 3 characters starting 7 from the end
+    fn substring<S: ToOffset, E: ToOffset>(&self, start: S, end: E) -> &str;
 
     /// Return a substring from the start and to a specified end character index
     fn substring_start(&self, end: i64) -> &str {
@@ -36,7 +40,8 @@ pub trait SubstringReplace where Self: AsRef<str> {
     // Replace substring delimited by start and end character index
     // with any string (&str)
     // To inject a string use substring_insert()
-    fn substring_replace<T: ToOffset>(&self, replacement: &str, start: usize, end: T) -> String;
+    // Both start and end accept negative offsets counting back from the end of the string
+    fn substring_replace<S: ToOffset, E: ToOffset>(&self, replacement: &str, start: S, end: E) -> String;
 
     /// Replace substring delimited by start and end character index
     /// Unlike the default substring_replace() method, the end index may be negative,
@@ -163,20 +168,24 @@ impl<S: AsRef<str>> SubstringReplace for S {
 
     /// Extract substring by character indices and hand overflow gracefully
     /// if the end index is equal or greater than start index, the function will yield an empty string
-    fn substring<T: ToOffset>(&self, start: usize, end: T) -> &str {
-        let end_index = end.to_offset(self.char_len());
-        if end_index > start {
-            &self.as_ref()[self.to_start_byte_index(start)..self.to_end_byte_index(end_index)]
+    fn substring<A: ToOffset, B: ToOffset>(&self, start: A, end: B) -> &str {
+        let len = self.char_len();
+        let start_index = start.to_offset(len);
+        let end_index = end.to_offset(len);
+        if end_index > start_index {
+            &self.as_ref()[self.to_start_byte_index(start_index)..self.to_end_byte_index(end_index)]
         } else {
             ""
         }
     }
 
     /// Replace a segment delimited by start and end characters indices with a string pattern (&str)
-    fn substring_replace<T: ToOffset>(&self, replacement: &str, start: usize, end: T) -> String {
-        let end_index = end.to_offset(self.char_len());
+    fn substring_replace<A: ToOffset, B: ToOffset>(&self, replacement: &str, start: A, end: B) -> String {
+        let len = self.char_len();
+        let start_index = start.to_offset(len);
+        let end_index = end.to_offset(len);
         let text = self.as_ref();
-        [&text[0..self.to_start_byte_index(start)], replacement, &text[self.to_end_byte_index(end_index)..]].concat()
+        [&text[0..self.to_start_byte_index(start_index)], replacement, &text[self.to_end_byte_index(end_index)..]].concat()
     }
 
     /// Translate the character start index to the start byte index
