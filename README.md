@@ -4,7 +4,7 @@
 
 # substring-replace: Substring Manipulation for Rust
 
-This crate adds intuitive substring methods for manipulating Rust strings with character indices, handling multibyte characters with ease, similar to `substring()` in JavaScript, Java, or C#, and `substr()` in C++ or PHP.
+This crate adds intuitive substring methods for manipulating Rust strings with character indices, handling multibyte characters with ease, similar to `substring()` in JavaScript, Java or C#, and `substr()` in C++ or PHP.
 
 ## Features
 
